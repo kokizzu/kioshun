@@ -53,7 +53,8 @@ outer:
 
 // Import inserts/overwrites with absolute expiry. Cluster replication,
 // backfill, and rebalancing use this to apply authoritative state (including
-// LWW versions) without admission/eviction decisions.
+// LWW versions) while still honoring per-shard capacity; it skips admission
+// filters but evicts victims if the shard is full before inserting.
 func (c *InMemoryCache[K, V]) Import(items []Item[K, V]) {
 	now := time.Now().UnixNano()
 	for _, it := range items {
