@@ -1807,7 +1807,7 @@ func TestVictimFrequencyTracking(t *testing.T) {
 	cache.Set("high_freq", 2, time.Hour)
 	waitForWrites(t, cache)
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		cache.Get("high_freq")
 	}
 	cache.Get("low_freq")

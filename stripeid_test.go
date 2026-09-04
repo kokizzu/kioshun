@@ -83,7 +83,7 @@ func TestStripeIDMaskedStable(t *testing.T) {
 func TestStripeTokenNotTinyBatched(t *testing.T) {
 	// The pointer prevents the runtime's tiny allocator from delaying cleanup
 	// and leaking IDs. Keep this check with stripeToken's matching comment.
-	typ := reflect.TypeOf(stripeToken{})
+	typ := reflect.TypeFor[stripeToken]()
 	for i := range typ.NumField() {
 		if typ.Field(i).Type.Kind() == reflect.Pointer {
 			return

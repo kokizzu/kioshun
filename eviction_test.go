@@ -466,7 +466,7 @@ func TestLFUSpecificBehavior(t *testing.T) {
 	cache.Set("c", 3, time.Hour)
 	waitForWrites(t, cache)
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		cache.Get("a")
 	}
 

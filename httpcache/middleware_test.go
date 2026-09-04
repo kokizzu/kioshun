@@ -315,7 +315,7 @@ func TestHTTPCacheMiddleware_LargeBodyIsNotCached(t *testing.T) {
 	})
 	wrappedHandler := middleware.Wrap(handler)
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		req := httptest.NewRequest("GET", "/large", nil)
 		rec := httptest.NewRecorder()
 		wrappedHandler.ServeHTTP(rec, req)
@@ -340,7 +340,7 @@ func TestHTTPCacheMiddleware_FlushDisablesCaching(t *testing.T) {
 	})
 	wrappedHandler := middleware.Wrap(handler)
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		req := httptest.NewRequest("GET", "/stream", nil)
 		rec := httptest.NewRecorder()
 		wrappedHandler.ServeHTTP(rec, req)
@@ -400,7 +400,7 @@ func TestHTTPCacheMiddleware_SwitchingProtocolsIsNotCached(t *testing.T) {
 	})
 	wrappedHandler := middleware.Wrap(handler)
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		req := httptest.NewRequest("GET", "/switch", nil)
 		rec := httptest.NewRecorder()
 		wrappedHandler.ServeHTTP(rec, req)
@@ -423,7 +423,7 @@ func TestHTTPCacheMiddleware_NonCacheableMethodBypassesCachedKey(t *testing.T) {
 	var calls int32
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		call := atomic.AddInt32(&calls, 1)
-		w.Write([]byte(fmt.Sprintf("%s:%d", r.Method, call)))
+		w.Write(fmt.Appendf(nil, "%s:%d", r.Method, call))
 	})
 	wrappedHandler := middleware.Wrap(handler)
 
@@ -464,7 +464,7 @@ func TestHTTPCacheMiddleware_EvictionCleansPatternIndex(t *testing.T) {
 	wrappedHandler := middleware.Wrap(handler)
 
 	const total = 2000
-	for i := 0; i < total; i++ {
+	for i := range total {
 		req := httptest.NewRequest("GET", fmt.Sprintf("/evict/%d", i), nil)
 		wrappedHandler.ServeHTTP(httptest.NewRecorder(), req)
 	}
@@ -1311,7 +1311,7 @@ func TestHTTPCacheMiddleware_ConcurrentInvalidation(t *testing.T) {
 	wrappedHandler := middleware.Wrap(handler)
 
 	// Cache multiple items
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		req := httptest.NewRequest("GET", fmt.Sprintf("/test/%d", i), nil)
 		rec := httptest.NewRecorder()
 		wrappedHandler.ServeHTTP(rec, req)
@@ -1322,11 +1322,11 @@ func TestHTTPCacheMiddleware_ConcurrentInvalidation(t *testing.T) {
 	var wg sync.WaitGroup
 	totalRemoved := int64(0)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		wg.Add(1)
 		go func(start int) {
 			defer wg.Done()
-			for j := 0; j < 10; j++ {
+			for j := range 10 {
 				removed := middleware.Invalidate(fmt.Sprintf("/test/%d", start*10+j))
 				atomic.AddInt64(&totalRemoved, int64(removed))
 			}
@@ -1340,7 +1340,7 @@ func TestHTTPCacheMiddleware_ConcurrentInvalidation(t *testing.T) {
 	}
 
 	// Verify all items are invalidated
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		req := httptest.NewRequest("GET", fmt.Sprintf("/test/%d", i), nil)
 		rec := httptest.NewRecorder()
 		wrappedHandler.ServeHTTP(rec, req)

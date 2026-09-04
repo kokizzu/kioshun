@@ -217,13 +217,13 @@ func TestPatternIndex_ConcurrentAccess(t *testing.T) {
 	done := make(chan bool)
 
 	go func() {
-		for i := 0; i < 100; i++ {
+		for i := range 100 {
 			pi.addKey("/api/test", fmt.Sprintf("key%d", i), shared)
 		}
 		done <- true
 	}()
 	go func() {
-		for i := 0; i < 100; i++ {
+		for range 100 {
 			pi.getMatchingKeys("/api/*")
 		}
 		done <- true
@@ -287,7 +287,7 @@ func benchmarkPatternKeys(n int, prefix string) []string {
 func BenchmarkPatternIndex_GetMatchingKeys(b *testing.B) {
 	pi := newPatternIndex()
 	shared := id()
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		pi.addKey("/api/v1/users", fmt.Sprintf("key%d", i), shared)
 	}
 	b.ResetTimer()
@@ -299,7 +299,7 @@ func BenchmarkPatternIndex_GetMatchingKeys(b *testing.B) {
 func BenchmarkPatternIndex_WildcardMatch(b *testing.B) {
 	pi := newPatternIndex()
 	shared := id()
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		pi.addKey("/api/v1/users", fmt.Sprintf("users-key%d", i), shared)
 		pi.addKey("/api/v1/posts", fmt.Sprintf("posts-key%d", i), shared)
 		pi.addKey("/api/v2/users", fmt.Sprintf("v2-users-key%d", i), shared)
